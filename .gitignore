@@ -1,0 +1,6 @@
+*.chp
+*.bin
+*.ubi
+*.ubifs
+*.sparse
+rootfs.tar*

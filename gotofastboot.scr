@@ -1,0 +1,2 @@
+echo going to fastboot mode
+fastboot 0
