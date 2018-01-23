@@ -1,0 +1,13 @@
+# CHIP cloner
+
+NOTE: as of now it is only possible to create images of Hynix CHIPs - they can be written onto
+Toshiba CHIPs though.
+
+NOTE: as of now, cloned chips cannot be cloned again
+
+0. Have a current version of Docker installed on your work station.
+1. Put the CHIP that's supposed to be cloned into fel mode and connect it to your computer via USB
+2. Start Chrome, got to flash.getchip.com, click flash, wait until CHIP autodetection is done.
+3. Select "Choose an Image..." and select clone.chp included in this repository (CAREFUL: if you select the wrong image here your CHIP might be overwritten...)
+4. Wait until "flashing" is done - actually nothing is written onto your CHIP it's booted in to a ram disk image
+5. Run clone.sh from the current directory

@@ -36,7 +36,7 @@ function main() {
     echo "OK"
 
     echo "Downloading rootfs.tar"
-    #curl 192.168.81.1:8080/backup >rootfs.tar
+    curl 192.168.81.1:8080/backup >rootfs.tar
     local ROOTFS=rootfs.tar
 
     local DOCKER_CMD=""
@@ -44,11 +44,11 @@ function main() {
     local NAND_CONFIG=${NAND_CONFIG:-$1}
     local NAND_CONFIG=${NAND_CONFIG:-hynix-mlc}
 
-#    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG spl         /opt/CHIP-u-boot/spl/sunxi-spl.bin         spl-$NAND_CONFIG.bin
-#    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG u-boot      /opt/CHIP-u-boot/u-boot-dtb.bin            uboot-$NAND_CONFIG.bin
-#    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG u-boot-env ./uboot-env.txt                             uboot-env-$NAND_CONFIG.bin
-#    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG ubifs      $ROOTFS                                     rootfs-$NAND_CONFIG.ubifs
-#    docker_run $CHIP_NAND_SCRITPS_IMAGE mk_chip_image $NAND_CONFIG ubi        rootfs-$NAND_CONFIG.ubifs                   rootfs-$NAND_CONFIG.ubi
+    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG spl         /opt/CHIP-u-boot/spl/sunxi-spl.bin         spl-$NAND_CONFIG.bin
+    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG u-boot      /opt/CHIP-u-boot/u-boot-dtb.bin            uboot-$NAND_CONFIG.bin
+    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG u-boot-env ./uboot-env.txt                             uboot-env-$NAND_CONFIG.bin
+    docker_run $CHIP_NAND_SCRIPTS_IMAGE mk_chip_image $NAND_CONFIG ubifs      $ROOTFS                                     rootfs-$NAND_CONFIG.ubifs
+    docker_run $CHIP_NAND_SCRITPS_IMAGE mk_chip_image $NAND_CONFIG ubi        rootfs-$NAND_CONFIG.ubifs                   rootfs-$NAND_CONFIG.ubi
 
     rm -f fel.chp
     rm -f fastboot.chp
