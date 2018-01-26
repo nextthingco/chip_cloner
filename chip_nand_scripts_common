@@ -1,0 +1,135 @@
+#!/bin/bash
+
+export PATH="$SCRIPTDIR/tools/bin:$SCRIPTDIR/tools/sbin:$SCRIPTDIR/tools/usr/bin:$SCRIPTDIR/tools/usr/sbin:$PATH"
+
+TIMEOUT=15
+
+#------------------------------------------------------------
+wait_for_fastboot() {
+  echo -n "waiting for fastboot...";
+  for ((i=$TIMEOUT; i>0; i--)) {
+    if [[ ! -z "$(fastboot -i 0x1f3a $@ devices)" ]]; then
+      echo "OK";
+      return 0;
+    fi
+    echo -n ".";
+    sleep 1
+  }
+
+  echo "TIMEOUT";
+  exit 1
+}
+
+#------------------------------------------------------------
+wait_for_fel() {
+  echo -n "waiting for fel...";
+  for ((i=$TIMEOUT; i>0; i--)) {
+    if ${FEL} $@ ver 2>/dev/null >/dev/null; then
+      echo "OK"
+      return 0;
+    fi
+    echo -n ".";
+    sleep 1
+  }
+
+  echo "TIMEOUT";
+  exit 1
+}
+
+#------------------------------------------------------------
+file_exists_or_quit() {
+  if [[ ! -f "$1" ]]; then
+    echo -e "\nERROR: file $1 does not exists\n\n"
+    exit 1
+  fi
+}
+
+#------------------------------------------------------------
+require_fel() {
+  FEL=$(which sunxi-fel)
+  FEL=${FEL:-$(which fel)}
+  if [[ -z "$FEL" ]]; then
+    echo "ERROR: cannot find sunxi fel or fel - please install sunxi-tools"
+    exit 1
+  fi
+
+  export FEL
+  alias fel="${FEL}"
+}
+
+#------------------------------------------------------------
+require() {
+  if [[ -z "$1" ]]; then
+    echo -e "\nusage: require EXECUTABLE\n\n"
+  fi
+
+  if [[ "$1" == "fel" ]] || [[ "$1" == "sunxi-fel" ]]; then
+    require_fel
+    return
+  fi
+
+  path_to_executable=$(which $1) 
+
+  if [[ -z "${path_to_executable}" ]]; then
+    echo -e "\nERROR: cannot find $1 in PATH\n"
+
+    if [[ ! -z "$2" ]]; then
+      echo -e "$2\n"
+    fi
+
+    exit 1
+  fi
+}
+
+#------------------------------------------------------------
+onMac() {
+  if [ "$(uname)" == "Darwin" ]; then
+    return 0;
+  else
+    return 1;
+  fi
+}
+
+#------------------------------------------------------------
+filesize() {
+  if onMac; then
+    stat -f "%z" $1
+  else
+    stat --printf="%s" $1
+  fi
+}
+
+#------------------------------------------------------------
+read_nand_config() {
+  local CONFIGFILE=$1
+
+  if [[ -z "$SCRIPTDIR" ]]; then
+      local SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  fi
+
+  if [[ ! -f "${CONFIGFILE}" ]]; then
+    CONFIGFILE="$SCRIPTDIR/$1"
+  fi
+
+  if [[ ! -f "${CONFIGFILE}" ]]; then
+    CONFIGFILE="$SCRIPTDIR/nand_configs/$1"
+  fi
+
+  if [[ -f "${CONFIGFILE}" ]]; then
+    echo "Reading ${CONFIGFILE}"
+    source "${CONFIGFILE}"
+    export NAND_EBSIZE=`printf %x $NAND_ERASE_BLOCK_SIZE`
+    export NAND_PSIZE=`printf %x $NAND_PAGE_SIZE`
+    export NAND_OSIZE=`printf %x $NAND_OOB_SIZE`
+    export NAND_TYPE
+    export NAND_MAXLEB_COUNT
+    export NAND_SUBPAGE_SIZE
+    export NAND_ERASE_BLOCK_SIZE
+    export NAND_PAGE_SIZE
+    export NAND_OOB_SIZE
+  else
+    echo -e "ERROR: cannot find NAND configuration \"$1\"."
+    exit 1
+  fi;
+}
+
