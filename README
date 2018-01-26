@@ -12,3 +12,13 @@ NOTE: as of now, cloned chips cannot be cloned again
 4. Wait until "flashing" is done - actually nothing is written onto your CHIP it's booted in to a ram disk image
 5. Run clone.sh from the current directory
 6. If everything went well you should now have an image.chp in your current directory.
+
+## Knonw Issues:
+
+-WIFI: cloned chips seem to miss wlan0 - this can be fixed by deleting /etc/udev/rules.d on the device
+       the file will be re-created on next boot
+     TODO: - exclude this file when creating the rootfs.tar?
+           - what else should be excluded? ssh-host keys?
+     NOTE: - we should distinguish between:'
+           -- a) backup (to be restored by same user, keep credentials and ssh host keys?)
+           -- b) generic image creation (wipe wifi credentials, ssh host and client keys, etc.)
